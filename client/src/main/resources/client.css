@@ -1,0 +1,61 @@
+.welcome-root {
+    -fx-background-color: #f0f0f0;
+    -fx-alignment: center;
+    -fx-spacing: 35;
+    -fx-padding: 80 50 80 50;
+}
+
+.game-root {
+    -fx-background-color: #f0f0f0;
+}
+
+.end-root {
+    -fx-background-color: #f0f0f0;
+    -fx-alignment: center;
+    -fx-spacing: 40;
+    -fx-padding: 100 50 100 50;
+}
+
+.white-text {
+    -fx-text-fill: white;
+}
+
+.welcome-root TextField {
+    -fx-pref-width: 280px;
+}
+
+.welcome-root Button {
+    -fx-pref-width: 320px;
+}
+
+.welcome-root VBox {
+    -fx-spacing: 20;
+    -fx-alignment: center;
+    -fx-padding: 30 50 30 50;
+}
+
+.welcome-root HBox {
+    -fx-spacing: 15;
+    -fx-alignment: center;
+}
+
+.end-root VBox {
+    -fx-spacing: 15;
+    -fx-alignment: center;
+}
+
+.theme-green {
+    -fx-background-color: linear-gradient(to bottom, #0d5c2f, #0a4523);
+}
+
+.theme-purple {
+    -fx-background-color: linear-gradient(to bottom, #2c0d54, #1a0833);
+}
+
+.end-root .return-button,
+.end-root .exit-button {
+    -fx-pref-width: 280px;
+}
+
+
+

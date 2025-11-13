@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane fx:id="gameRoot" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="ClientGameController" stylesheets="@client.css" styleClass="game-root"
+            prefWidth="1000" prefHeight="700">
+    
+    <!-- Menu Bar -->
+    <top>
+        <MenuBar>
+            <Menu text="Options">
+                <MenuItem text="Fresh Start" onAction="#handleFreshStart"/>
+                <MenuItem text="New Look" onAction="#handleNewLook"/>
+                <MenuItem text="Exit" onAction="#handleExit"/>
+            </Menu>
+        </MenuBar>
+    </top>
+    
+    <!-- Main Game Area -->
+    <center>
+        <VBox fx:id="gamePane" spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <!-- Dealer's Cards Area -->
+            <VBox spacing="8" alignment="CENTER">
+                <Text fx:id="dealerCardLabel" text="Dealer's Hand"/>
+                <Text fx:id="dHandVal" text=""/>
+                <HBox spacing="12" alignment="CENTER">
+                    <ImageView fx:id="d1" fitWidth="110" fitHeight="154" preserveRatio="true"/>
+                    <ImageView fx:id="d2" fitWidth="110" fitHeight="154" preserveRatio="true"/>
+                    <ImageView fx:id="d3" fitWidth="110" fitHeight="154" preserveRatio="true"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Player's Cards Area -->
+            <VBox spacing="8" alignment="CENTER">
+                <Text fx:id="yourHandLabel" text="Your Hand"/>
+                <Text fx:id="pHandVal" text=""/>
+                <HBox spacing="12" alignment="CENTER">
+                    <ImageView fx:id="c1" fitWidth="110" fitHeight="154" preserveRatio="true"/>
+                    <ImageView fx:id="c2" fitWidth="110" fitHeight="154" preserveRatio="true"/>
+                    <ImageView fx:id="c3" fitWidth="110" fitHeight="154" preserveRatio="true"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Betting Area -->
+            <HBox spacing="25" alignment="CENTER">
+                <padding>
+                    <Insets top="95" right="0" bottom="0" left="0"/>
+                </padding>
+                <VBox spacing="8" alignment="CENTER">
+                    <Text fx:id="anteLabel" text="Ante Wager"/>
+                    <TextField fx:id="anteWagerField" promptText="5-25" 
+                               prefWidth="100" alignment="CENTER"/>
+                    <Text fx:id="ante" text="0"/>
+                </VBox>
+                
+                <VBox spacing="8" alignment="CENTER">
+                    <Text fx:id="ppLabel" text="Pair Plus"/>
+                    <TextField fx:id="ppWagerField" promptText="5-25" 
+                               prefWidth="100" alignment="CENTER"/>
+                    <Text fx:id="pp" text="0"/>
+                </VBox>
+                
+                <VBox spacing="8" alignment="CENTER">
+                    <Text fx:id="playLabel" text="Play Wager"/>
+                    <Text fx:id="play" text="0"/>
+                </VBox>
+                
+                <VBox spacing="8" alignment="CENTER">
+                    <Text fx:id="winningsLabel" text="Total Winnings"/>
+                    <Text fx:id="cash" text="0"/>
+                </VBox>
+            </HBox>
+            
+            <!-- Action Buttons -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="confirmButton" text="Confirm Bets" onAction="#handleConfirm" prefWidth="140"/>
+                <Button fx:id="dealButton" text="Deal" onAction="#handleDeal" prefWidth="140" disable="true"/>
+                <Button fx:id="playButton" text="Play" onAction="#handlePlay" prefWidth="140" disable="true"/>
+                <Button fx:id="foldButton" text="Fold" onAction="#handleFold" prefWidth="140" disable="true"/>
+            </HBox>
+        </VBox>
+    </center>
+    
+    <!-- Game Log on Right Side -->
+    <right>
+        <VBox spacing="10" prefWidth="350">
+            <padding>
+                <Insets top="20" right="12" bottom="20" left="12"/>
+            </padding>
+            
+            <Text text="Game Log"/>
+            <ListView fx:id="listItems2" VBox.vgrow="ALWAYS" prefHeight="600"/>
+        </VBox>
+    </right>
+    
+</BorderPane>
