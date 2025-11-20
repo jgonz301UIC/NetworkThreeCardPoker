@@ -58,8 +58,19 @@ public class Server {
         }
     }
     
-    public int getClientCount() {
+    public synchronized int getClientCount() {
         return clients.size();
+    }
+    
+    // Synchronized method to log messages in proper order
+    private synchronized void logMessage(String message) {
+        callback.accept(message);
+    }
+    
+    // Synchronized method to remove client
+    private synchronized void removeClient(ClientThread client) {
+        clients.remove(client);
+        JavaFXTemplate.updateClientCount(clients.size());
     }
     
     class TheServer extends Thread {
@@ -68,19 +79,21 @@ public class Server {
         public void run() {
             try {
                 mysocket = new ServerSocket(port);
-                callback.accept("Server is waiting for a client on port " + port);
+                Server.this.logMessage("Server is waiting for a client on port " + port);
                 
                 while (isRunning) {
                     ClientThread c = new ClientThread(mysocket.accept(), count);
-                    callback.accept("Client " + count + " has connected to server");
-                    clients.add(c);
+                    synchronized (Server.this) {
+                        callback.accept("Client " + count + " has connected to server");
+                        clients.add(c);
+                        count++;
+                        JavaFXTemplate.updateClientCount(clients.size());
+                    }
                     c.start();
-                    count++;
-                    JavaFXTemplate.updateClientCount(clients.size());
                 }
             } catch (Exception e) {
                 if (isRunning) {
-                    callback.accept("Server socket did not launch: " + e.getMessage());
+                    Server.this.logMessage("Server socket did not launch: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -113,9 +126,9 @@ public class Server {
                 welcome.buttonPressed = 0; // 0 means ready to play
                 out.writeObject(welcome);
                 out.reset();
-                callback.accept("Client " + count + " - Sent initial welcome message");
+                Server.this.logMessage("Client " + count + " sent initial welcome message");
             } catch (Exception e) {
-                callback.accept("Streams not open for client " + count);
+                Server.this.logMessage("Streams not open for client " + count);
                 return;
             }
             
@@ -136,8 +149,8 @@ public class Server {
                     out.reset();
                     
                 } catch (Exception e) {
-                    callback.accept("Client " + count + " disconnected");
-                    clients.remove(this);
+                    Server.this.logMessage("Client " + count + " disconnected");
+                    Server.this.removeClient(this);
                     break;
                 }
             }
@@ -146,12 +159,12 @@ public class Server {
         private void handleDeal(PokerInfo data) {
             // Validate bets
             if (data.ante < 5 || data.ante > 25) {
-                callback.accept("Client " + count + " has invalid ante bet: $" + data.ante);
+                Server.this.logMessage("Client " + count + " has invalid ante bet: $" + data.ante);
                 return;
             }
             
             if (data.pairPlus > 0 && (data.pairPlus < 5 || data.pairPlus > 25)) {
-                callback.accept("Client " + count + " has invalid pair plus bet: $" + data.pairPlus);
+                Server.this.logMessage("Client " + count + " has invalid pair plus bet: $" + data.pairPlus);
                 return;
             }
             
@@ -179,7 +192,7 @@ public class Server {
             data.pHandVal = ThreeCardLogic.evalHand(playerHand).getName();
             data.dHandVal = ThreeCardLogic.evalHand(dealerHand).getName();
             
-            callback.accept("Client " + count + " has dealt: Ante=$" + data.ante + 
+            Server.this.logMessage("Client " + count + " has dealt: Ante=$" + data.ante + 
                           ", PP=$" + data.pairPlus + ", Player: " + data.pHandVal);
         }
         
@@ -196,10 +209,10 @@ public class Server {
                 int ppWinnings = ThreeCardLogic.evalPPWinnings(playerHand, player.getPairPlusBet());
                 if (ppWinnings > 0) {
                     winnings += ppWinnings;
-                    callback.accept("Client " + count + " has won Pair Plus: $" + ppWinnings);
+                    Server.this.logMessage("Client " + count + " has won Pair Plus: $" + ppWinnings);
                 } else {
                     winnings -= player.getPairPlusBet();
-                    callback.accept("Client " + count + " has lost Pair Plus: -$" + player.getPairPlusBet());
+                    Server.this.logMessage("Client " + count + " has lost Pair Plus: -$" + player.getPairPlusBet());
                 }
             }
             
@@ -209,7 +222,7 @@ public class Server {
             if (!dealerQualifies) {
                 // Dealer doesn't qualify - both ante and play wagers are returned (pushed)
                 // No winnings, no losses from ante/play bets
-                callback.accept("Client " + count + " has dealer's cards does not qualify (ante pushed)");
+                Server.this.logMessage("Client " + count + " has dealer's cards does not qualify (ante pushed)");
                 data.winner = 0; // Indicate dealer didn't qualify
             } else {
                 // Compare hands
@@ -219,13 +232,13 @@ public class Server {
                 if (result == 1) { // Player wins
                     int antePlayWin = (player.getAnteBet() + player.getPlayBet()) * 2;
                     winnings += antePlayWin;
-                    callback.accept("Client " + count + " has player wins: $" + antePlayWin);
+                    Server.this.logMessage("Client " + count + " has player wins: $" + antePlayWin);
                 } else if (result == 2) { // Dealer wins
                     int loss = player.getAnteBet() + player.getPlayBet();
                     winnings -= loss;
-                    callback.accept("Client " + count + " has dealer wins: -$" + loss);
+                    Server.this.logMessage("Client " + count + " has dealer wins: -$" + loss);
                 } else { // Tie
-                    callback.accept("Client " + count + " cards are pushed. Tie game");
+                    Server.this.logMessage("Client " + count + " cards are pushed. Tie game");
                 }
             }
             
@@ -233,7 +246,7 @@ public class Server {
             data.winningsThisRound = winnings;
             data.cash = player.getTotalWinnings();
             
-            callback.accept("Client " + count + " has total winnings: $" + data.cash);
+            Server.this.logMessage("Client " + count + " has total winnings: $" + data.cash);
         }
         
         private void handleFold(PokerInfo data) {
@@ -246,7 +259,7 @@ public class Server {
             data.winningsThisRound = -loss;
             data.cash = player.getTotalWinnings();
             
-            callback.accept("Client " + count + " has folded: -$" + loss + ", Total: $" + data.cash);
+            Server.this.logMessage("Client " + count + " has folded: -$" + loss + ", Total: $" + data.cash);
         }
     }
 }

@@ -49,24 +49,28 @@ public class ServerGameController {
     
     public void updateClientCount(int count) {
         Platform.runLater(() -> {
-            numClientsText.setText(String.valueOf(count));
+            synchronized (this) {
+                numClientsText.setText(String.valueOf(count));
+            }
         });
     }
     
     public void addLogMessage(Object message) {
         Platform.runLater(() -> {
-            String timeStamp = java.time.LocalTime.now().format(
-                java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
-            logMessages.add(0, "[" + timeStamp + "] " + message.toString());
-            
-            // Keep log to reasonable size
-            if (logMessages.size() > 500) {
-                logMessages.remove(logMessages.size() - 1);
-            }
-            
-            // Update client count
-            if (server != null) {
-                numClientsText.setText(String.valueOf(server.getClientCount()));
+            synchronized (this) {
+                String timeStamp = java.time.LocalTime.now().format(
+                    java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+                logMessages.add(0, "[" + timeStamp + "] " + message.toString());
+                
+                // Keep log to reasonable size
+                if (logMessages.size() > 500) {
+                    logMessages.remove(logMessages.size() - 1);
+                }
+                
+                // Update client count
+                if (server != null) {
+                    numClientsText.setText(String.valueOf(server.getClientCount()));
+                }
             }
         });
     }
