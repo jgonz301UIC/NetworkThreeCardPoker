@@ -8,8 +8,8 @@
 <?import javafx.scene.text.Text?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="ServerStartController" stylesheets="@server.css" styleClass="start-root" 
-      prefWidth="1000" prefHeight="700">
+        fx:controller="ServerStartController" stylesheets="@server.css" styleClass="start-root" 
+        prefWidth="1000" prefHeight="700">
     
     <Text text="THREE CARD POCKER SERVER" styleClass="title"/> 
     <Text text="Configure and Start Server" styleClass="subtitle"/>
